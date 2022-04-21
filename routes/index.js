@@ -9,5 +9,6 @@ const router = express.Router()
 
 router.use("/review", reviewRoutes)
 router.use("/user", userRoutes)
+router.use("/apartment", apartmentRoutes)
 
 module.exports = router

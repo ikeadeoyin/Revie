@@ -5,7 +5,7 @@ const bcrypt = require("bcrypt")
 const userSchema = new mongoose.Schema({
     username:{
         type: String,
-        required: true
+        required:[ true, "Please enter a username"]
     },
     email:{
         type: String,
@@ -18,6 +18,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, "Enter a password with min. of 6 chars"]
     },
+    role:{
+        type: String,
+        enum: ["user", "landlord"],
+        default: "user"
+
+    }
 },
 {timestamps: true}
 )
@@ -29,6 +35,19 @@ userSchema.pre('save', async function (next) {
     this.password = await bcrypt.hash(this.password, salt);
   });
 
+// userSchema.static.emailExists = function(email){
+//     const user = User.findOne({email})
+//     if(user) {
+
+//     }
+// }
+
+
+
+userSchema.methods.isPasswordMatch = async function (password) {
+    const user = this;
+    return await bcrypt.compare(password, user.password);
+  };
 
 
 
