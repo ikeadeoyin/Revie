@@ -2,12 +2,12 @@ const mongoose = require("mongoose")
 
 const reviewSchema = new mongoose.Schema({
     user:{
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
     apartment:{
-        type: Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         ref: 'Apartment',
         required: true
     },
@@ -26,13 +26,13 @@ const reviewSchema = new mongoose.Schema({
         max: 5,
         required: [true, 'Please add a rating between 1 and 5']
     },
-    amenties_ratings: {
+    amenities_rating: {
         type: Number,
         min: 1,
         max: 5,
         required: [true, 'Please add a rating between 1 and 5']
     },
-    landlord_ratings: {
+    landlord_rating: {
         type: Number,
         min: 1,
         max: 5,
@@ -44,11 +44,21 @@ const reviewSchema = new mongoose.Schema({
         max: 5,
         required: [true, 'Please add a rating between 1 and 5']
     },
-    helpfulCount: {},
+    helpful_count: {
+        type: Number,
+        default: 0
+    },
 
 
 },
-{timestamps: true})
+{timestamps: true,
+    // toJSON: {
+    //     virtuals: true
+    // },
+    // toObject: {
+    //     virtuals: true
+    // }
+})
 
 const Review = mongoose.model("Review", reviewSchema);
 

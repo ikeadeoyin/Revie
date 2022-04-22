@@ -6,7 +6,7 @@ const  {errorHandler} = require("../utils/errorHandler")
 
 const addApartment= async (req, res, next) => {
 
-    const {name, price, address, units, bedroom, kitchen, bathroom, media, phone_number, website,landlord} = req.body
+    const {name, price, address, units, bedroom, kitchen, bathroom, media, phone_number, amenities, website,landlord} = req.body
     try {
 
         // check if user exists
@@ -30,6 +30,7 @@ const addApartment= async (req, res, next) => {
             media,
             address,
             website,
+            amenities,
             phone_number,
             landlord
         })
@@ -67,20 +68,86 @@ const getApartment = async(req, res, next) => {
     }
 }
 
+// update an apartment
 const updateApartment = async(req, res, next) => {
     const  apartmentID = req.params.id
 
-    const apartment = await Apartment.findById(apartmentID)
- 
-    try {
-        if(!apartment) {
-         return res.status(300).send(`Apartment with id ${apartmentID} does not exist`)
-        } 
+
+      // check if apartment exists
+      const apartmentExists = await Apartment.findById(apartmentID).populate("landlord")
+      if (!apartmentExists){
+          return res.status(300).send(`Apartment with id ${apartmentID} does not exist`)
+      }
+
+     // ensure that user role is Landlord
+     if (apartmentExists.landlord.role !== "landlord"){
+        console.log(apartmentExists.landlord.role)
+        return res.status(300).send("Basic User is not authorized to update apartments.")
+     }
+    try { 
         apartment = await Apartment.findByIdAndUpdate(apartmentID, req.body, {new:true})
+        res.status(200).json({
+            success: true,
+            apartment
+        })
     }
-    catch{}
+    catch(err){
+        console.log(err)
+        const errors = errorHandler(err);
+        res.status(400).json({errors});    
+    }
 
 } 
-const getAllApartments = () => {}
+// Get all apartments
+const getAllApartments = async(req, res, next) => {
+    try {
+        const apartments = await Apartment.find({})
+
+        res.status(200).send({
+            success: true,
+            apartments
+        })
+ 
+    } catch (err) {
+        console.log(err)
+        const errors = errorHandler(err);
+        res.status(400).json({errors}); 
+        
+    }
+
+   
+
+}
+
+
+// Get apartment by ID
+
+// Get all apartments by a unique user
+
+// Get all reviews for an apartment
+
+
+const getAllReviews = async(req, res, next) => {
+    const apartmentID = req.params.id
+    
+
+    const apartmentExists = await Apartment.findById(apartmentID)
+    if(!apartmentExists){
+        console.log("no apartment found")
+    }
+    const apartmentReviews = await apartmentExists.populate("reviews")
+    console.log(apartmentReviews.reviews)
+   
+     res.status(200).json({
+         success:true,
+         reviews:apartmentReviews.reviews
+
+     })
+
+}
+
+
+// delete apartment
+
 const deleteApartment = () => {}
-module.exports = {addApartment, getApartment}
+module.exports = {addApartment, getApartment, updateApartment, getAllApartments, getAllReviews}

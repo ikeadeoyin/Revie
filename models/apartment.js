@@ -1,5 +1,6 @@
 const mongoose = require("mongoose")
 const {isEmail, isURL} = require("validator")
+const Review = require("./review")
 
 const apartmentSchema = new mongoose.Schema({
     name:{
@@ -37,19 +38,19 @@ const apartmentSchema = new mongoose.Schema({
     },
     amenities: {
         // Array of Strings
-        type: [String],
+        type: [ String ],
         required: true,
         enum: [
-          'Lux Appliances',
-          'wifi',
-          'Swimming Pool',
-          'Parking Place',
-          'Gym and Fitness',
-          'Outdoor Space',
-          'Fireplace',
-          'Elevator',
-          'Basketball court',
-          'Lawn Tennis court'
+          "Lux Appliances",
+          "wifi",
+          "Swimming Pool",
+          "Parking Place",
+          "Gym and Fitness",
+          "Outdoor Space",
+          "Fireplace",
+          "Elevator",
+          "Basketball court",
+          "Lawn Tennis court"
         ]
     },
     media:{
@@ -62,11 +63,32 @@ const apartmentSchema = new mongoose.Schema({
     website:{
         type: String,
         validate: [isURL, "Enter a valid URL"]
-    }
-      
+    },
      
 },
-{timestamps: true})
+{
+    timestamps: true,
+    toJSON: {
+        virtuals: true
+    },
+    toObject: {
+        virtuals: true
+    }
+})
+
+
+// const authorSchema = new Schema({ name: String }, {
+//     toJSON: { virtuals: true }, // So `res.json()` and other `JSON.stringify()` functions include virtuals
+//     toObject: { virtuals: true } // So `console.log()` and other functions that use `toObject()` include virtuals
+//   });
+
+// do reverse populate with virtual
+apartmentSchema.virtual("reviews", {
+    ref: Review,
+    localField: "_id",
+    foreignField: "user",
+    justOne:false
+})
 
 const Apartment = mongoose.model("Apartment", apartmentSchema)
 
