@@ -8,7 +8,7 @@ const  {errorHandler} = require("../utils/errorHandler")
 
 
 const signup = async (req, res, next) => {
-    const {username, email, password} = req.body
+    const {username, email, password, role} = req.body
 
     // check if user already exists
 
@@ -18,7 +18,7 @@ const signup = async (req, res, next) => {
     }
 
     try {
-        const user = await User.create({username, email, password})
+        const user = await User.create({username, email, password, role})
         const token = createToken(user._id)
         res.cookie("jwt", token, {httpOnly:true, maxAge:maxAge * 1000});
 
@@ -44,7 +44,7 @@ const login = async (req, res, next)  =>{
     }
     const token = createToken(user._id);
     res.cookie("jwt", token, {httpOnly:true, maxAge:maxAge * 1000})
-    res.status(200).json({user:user._id})
+    res.status(200).json({user, token})
     } catch (err) {
         errorHandler(err)
         

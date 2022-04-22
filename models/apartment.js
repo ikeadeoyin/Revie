@@ -7,7 +7,7 @@ const apartmentSchema = new mongoose.Schema({
         required:[ true, "Please enter the apartment's name"]
     },
     price: {
-        type: Float,
+        type: Number,
         required: [true, "Enter the apartment's price"]
     },
     address:{
@@ -17,25 +17,25 @@ const apartmentSchema = new mongoose.Schema({
     units: {
         type: Number,
         required: [true, 'Please add units available']
-      },
-      bedroom: {
+    },
+    bedroom: {
         type: Number,
         required: [true, 'Please add number of bedroom']
-      },
-      kitchen: {
+    },
+    kitchen: {
         type: Number,
         required: [true, 'Please add number of kitchen']
-      },
-      bathroom: {
+    },
+    bathroom: {
         type: Number,
         required: [true, 'Please add number of bathroom']
-      },
-      landlord: {
+    },
+    landlord: {
         type: mongoose.Schema.ObjectId,
         ref: 'User',
         required: true
-      },
-      amenities: {
+    },
+    amenities: {
         // Array of Strings
         type: [String],
         required: true,
@@ -51,12 +51,10 @@ const apartmentSchema = new mongoose.Schema({
           'Basketball court',
           'Lawn Tennis court'
         ]
-      },
-      photo:{
+    },
+    media:{
+          // optional media of videos and/or photos
           type: [String]
-      },
-      video:{
-        type: [String]
     },
     phone_number:{
         type: String

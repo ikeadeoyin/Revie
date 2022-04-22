@@ -22,20 +22,32 @@ const createToken = id => {
   
 
 authorize = async (req, res, next) => {
-      // 1) check if the token is there
-      let token;
-      if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-        token = req.headers.authorization.split(" ")[1];
+    //   // 1) check if the token is there
+    //   let token= req.headers["x-access-token"] || req.headers.authorization || req.body.token;;
+    //   if (token || req.headers.authorization.startsWith("Bearer ")) {
+    //     token = req.headers.authorization.split(" ")[1].trim();
+    //   }
+    //   if (!token) {
+    //     return res.status(403).send( "You are not logged in! Please login in to continue")
+    //   }
+    let token;
+
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith('Bearer')
+    ) {
+      token = req.headers.authorization.split(' ')[1].trim();
+    }
+    if (!token) {
+        return res.status(403).send("You are not logged in! Please login in to continue");
       }
-      if (!token) {
-        return res.status(403).send( "You are not logged in! Please login in to continue")
-      }
+    
 
       try {
-          const decoded = jwt.verify(token. process.env.JWT_SECRET)
+          const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-          user = await User.findById(decoded.id)
-          req.user
+          req.user = await User.findById(decoded.id)
+        
           next()
       } catch (error) {
         res.status(401).json({
@@ -45,4 +57,21 @@ authorize = async (req, res, next) => {
     }
 }
 
-module.exports = {createToken, maxAge, authorize }
+const restrictTo = async (role) =>{
+    try {
+        if(role !== "landlord"){
+         return res.status(400).send("Basic User is not authorized to add apartments.")
+         next()
+    }
+        
+    } catch (error) {
+        console.log(error)
+        res.send(error)
+
+        
+    }
+    
+
+}
+
+module.exports = {createToken, maxAge, authorize, restrictTo }
