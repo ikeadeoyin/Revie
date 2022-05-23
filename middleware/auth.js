@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken")
 const {User} = require("../models/index")
+const {errorResponse} = require("../utils/errorResponse")
 
 const emailExists = (email = '') => {
     User.findOne({email})
@@ -21,15 +22,8 @@ const createToken = id => {
 
   
 
-authorize = async (req, res, next) => {
-    //   // 1) check if the token is there
-    //   let token= req.headers["x-access-token"] || req.headers.authorization || req.body.token;;
-    //   if (token || req.headers.authorization.startsWith("Bearer ")) {
-    //     token = req.headers.authorization.split(" ")[1].trim();
-    //   }
-    //   if (!token) {
-    //     return res.status(403).send( "You are not logged in! Please login in to continue")
-    //   }
+const authorize = async (req, res, next) => {
+  
     let token;
 
     if (
@@ -39,7 +33,7 @@ authorize = async (req, res, next) => {
       token = req.headers.authorization.split(' ')[1].trim();
     }
     if (!token) {
-        return res.status(403).send("You are not logged in! Please login in to continue");
+        return next(new errorResponse("You are not logged in! Please login in to continue", 403));
       }
     
 
@@ -50,25 +44,18 @@ authorize = async (req, res, next) => {
         
           next()
       } catch (error) {
-        res.status(401).json({
-            status: false,
-            message: "Sorry, you must provide a valid token."
-        })
+          return next(new errorResponse('You are not authorized to access this route', 401));
     }
 }
 
-const restrictTo = async (role) =>{
+const restrictTo = async (req, res, next, ...roles) =>{
     try {
-        if(role !== "landlord"){
-         return res.status(400).send("Basic User is not authorized to add apartments.")
-         next()
+      if (!roles.includes(req.user.role)){
+        return next(new ErrorResponse(`User role ${req.user.role} is not authorized to access this route`, 403))  
     }
         
     } catch (error) {
-        console.log(error)
-        res.send(error)
-
-        
+      return next(new ErrorResponse(error, 500))
     }
     
 

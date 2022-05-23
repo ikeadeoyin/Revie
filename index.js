@@ -11,6 +11,9 @@ const port = process.env.PORT || 3000
 dbConnect()
 
 
+app.get("/", (req, res)=>{
+    res.send(`Revie is running on port ${port}`)
+})
 
 app.listen(port, () => {
     console.log(`Revie is running on port ${port}`)

@@ -1,23 +1,36 @@
+const errorResponse = require('../utils/errorResponse')
+
 
 // handle errors
-const errorHandler = (err) =>{
-    console.log(err.message, err.code);
-    let errors = {email: " ",password: " "};
+const errorHandler = (err, req, res, next) =>{
+    // console.log(err.message, err.code);
+    let error = {...err};
+
+    error.message = err.message
+
+    console.log(err)
 
     // incorrect emails
     if(err.message === "incorrect email"){
-        errors.email = "that email is not registered";
+        const message = "that email is not registered"
+        error = new errorResponse(message, 400)
     }
 
     // incorrect password
     if(err.message === "incorrect password"){
-        errors.password = "That password is incorrect";
+        const message = "That password is incorrect";
+        const error = new err({
+            message: error ? error.message : 'Unauthorized',
+            status: httpStatus.UNAUTHORIZED,
+            stack: error ? error.stack : undefined,
+          });
+        error = new errorResponse(message, 400)
     }
 
     // unique email
     if (err.code === 11000) {
-        errors.email = "That email is already registered";
-        return errors;    
+        const message = "That email is already registered";
+        error = new errorResponse(message, 400)   
     }
 
     // validation errors
@@ -28,8 +41,14 @@ const errorHandler = (err) =>{
         });
     }
 
-    return errors;
+     // Mongoose validation error
+    if (err.name === 'ValidationError') {
+         const message = Object.values(err.errors).map(val => val.message);
+        error = new ErrorResponse(message, 400);
+     }
+
+    return error;
 
 }
 
-module.exports = {errorHandler}
+module.exports = errorHandler

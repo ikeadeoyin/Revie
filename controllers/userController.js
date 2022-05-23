@@ -2,8 +2,10 @@ const brcypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 const {User} = require("../models/index")
 
+
 const {createToken, maxAge} = require("../middleware/auth")
 const  {errorHandler} = require("../utils/errorHandler")
+const errorResponse = require("../utils/errorResponse")
 
 
 
@@ -24,8 +26,13 @@ const signup = async (req, res, next) => {
 
         return res.status(200).json({user:user, token})
     } catch (err) {
-        const errors = errorHandler(err);
-        res.status(400).json({errors}); 
+        // return errorHandler(err)
+        // return next(new errorResponse("Password is incorrect", 401))
+        // console.log(err)
+        const error = new errorResponse(err, 402)
+        return next(error)
+        // const errors = errorHandler(err);
+        // res.status(400).json({error}); 
         
     }
 

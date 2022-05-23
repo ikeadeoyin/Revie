@@ -7,7 +7,7 @@ const reviewRoutes = require("./reviewRoute")
 const router = express.Router()
 
 router.use("/", reviewRoutes)
-router.use("/user", userRoutes)
+router.use("/auth", userRoutes)
 router.use("/apartment", apartmentRoutes)
 
 module.exports = router
